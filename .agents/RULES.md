@@ -600,3 +600,7 @@
 - **[2026-10-14] Git Commit & Push ke GitHub**:
   - Remote repository: `https://github.com/imanecdoche/discash.git`
   - Mengikuti standar Conventional Commits, menjaga kebersihan commit (tidak men-commit build binaries, node_modules, .apk, atau cache gradle).
+
+- **[2026-10-14] README.md dalam Bahasa Inggris dengan Logo & Tags**:
+  - Menyusun `README.md` komprehensif dalam bahasa Inggris.
+  - Memuat logo di bagian atas dan tags/badges teknologi terkait proyek (React, TypeScript, Tailwind CSS, Capacitor, PWA, Framer Motion).
