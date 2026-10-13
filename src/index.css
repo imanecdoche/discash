@@ -1,0 +1,67 @@
+@import "tailwindcss";
+
+@theme {
+  --color-discord-blurple: #5865f2;
+  --color-discord-blurple-hover: #4752c4;
+  --color-discord-green: #23a55a;
+  --color-discord-yellow: #fee75c;
+  --color-discord-red: #f23f43;
+  --color-discord-fuchsia: #eb459e;
+
+  --color-discord-bg-primary: #313338;
+  --color-discord-bg-secondary: #2b2d31;
+  --color-discord-bg-tertiary: #1e1f22;
+  --color-discord-bg-floating: #232428;
+  --color-discord-bg-deepest: #111214;
+
+  --color-discord-header: #1e1f22;
+  --color-discord-header-border: rgba(0, 0, 0, 0.25);
+
+  --color-discord-text-normal: #dbdee1;
+  --color-discord-text-header: #e0e1e5;
+  --color-discord-text-muted: #949ba4;
+  --color-discord-text-interactive: #b5bac1;
+
+  --font-discord: "gg sans", "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --font-discord-wordmark: "gg sans", "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  background-color: var(--color-discord-bg-deepest);
+  color: var(--color-discord-text-normal);
+  font-family: var(--font-discord);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow: hidden;
+}
+
+/* Discord Custom Wordmark Style */
+.discord-wordmark {
+  font-family: "gg sans", "Plus Jakarta Sans", sans-serif;
+  font-weight: 850;
+  letter-spacing: -0.04em;
+  color: #e0e1e5; /* Non-pure white off-white tone */
+}
+
+/* Mobile Hardware Acceleration & 60+ FPS Momentum Scrolling */
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
+.overflow-y-auto,
+.overflow-x-auto {
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+}
+
+.transform-gpu {
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  perspective: 1000px;
+}

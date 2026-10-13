@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Discash</string>
+    <string name="title_activity_main">Discash</string>
+    <string name="package_name">com.discash.app</string>
+    <string name="custom_url_scheme">com.discash.app</string>
+</resources>
