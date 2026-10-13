@@ -15,8 +15,15 @@
   <a href="https://tailwindcss.com/"><img src="https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white" alt="Tailwind CSS" /></a>
   <a href="https://capacitorjs.com/"><img src="https://img.shields.io/badge/Capacitor_Android-119EFF?style=for-the-badge&logo=capacitor&logoColor=white" alt="Capacitor Android" /></a>
   <a href="https://www.framer.com/motion/"><img src="https://img.shields.io/badge/Framer_Motion-0055FF?style=for-the-badge&logo=framer&logoColor=white" alt="Framer Motion" /></a>
-  <img src="https://img.shields.io/badge/FPS-60%2B_Optimized-22C55E?style=for-the-badge" alt="60+ FPS" />
 </p>
+<p align="center">
+  <img src="https://img.shields.io/badge/Style-Discord_Dark_Tactile_3D-5865F2?style=for-the-badge&logo=discord&logoColor=white" alt="Discord Style" />
+  <img src="https://img.shields.io/badge/Performance-60%2B_FPS-22C55E?style=for-the-badge&logo=speedtest&logoColor=white" alt="60+ FPS" />
+  <img src="https://img.shields.io/badge/PWA-Ready-9B59B6?style=for-the-badge&logo=pwa&logoColor=white" alt="PWA Ready" />
+  <img src="https://img.shields.io/badge/Android-SDK_35-3DDC84?style=for-the-badge&logo=android&logoColor=white" alt="Android SDK 35" />
+  <img src="https://img.shields.io/badge/License-MIT-F59E0B?style=for-the-badge" alt="MIT License" />
+</p>
+
 
 ---
 
