@@ -604,3 +604,41 @@
 - **[2026-10-14] README.md dalam Bahasa Inggris dengan Logo & Tags**:
   - Menyusun `README.md` komprehensif dalam bahasa Inggris.
   - Memuat logo di bagian atas dan tags/badges teknologi terkait proyek (React, TypeScript, Tailwind CSS, Capacitor, PWA, Framer Motion).
+
+- **[2026-10-14] Fitur Wallet (Unallocated Assets) & Integrasi Alokasi Dana ke Goals**:
+  - **Konsep & Penyimpanan**:
+    * Mencatat saldo aset bebas (*unallocated funds*) di luar goals, mendukung multi-wallet (`discash_wallets` di `localStorage`).
+  - **Penempatan Navigasi & UI**:
+    * Tombol ikon Wallet bergaya Tactile 3D di sebelah kanan header `Dashboard`, serta interaksi pada `TotalBalanceCard` yang menampilkan saldo Goals dan Unallocated Assets (Wallets).
+    * Membuka halaman **Wallets (`WalletPage.tsx`)** secara fullscreen slide-in dari kanan (`fixed inset-0 z-[60] bg-[#313338]`, `x: '100%' -> 0`).
+  - **Alur Alokasi & Mutasi Terintegrasi**:
+    * Saat **Deposit (+ Add Funds)** atau **Withdraw (- Withdraw)** pada Goal (`GoalMutationSheet.tsx`), pengguna dapat memilih sumber/tujuan dana:
+      1. **`External / Direct`**: Dana dari/ke luar aplikasi tanpa memotong/menambah saldo wallet.
+      2. **Pilih Wallet Tertentu**: Otomatis memotong saldo wallet saat Deposit ke Goal (dengan validasi `Insufficient balance`) atau menambah saldo wallet saat Withdraw dari Goal.
+    * **Two-Way Atomic Revert**: Menghapus transaksi Goal yang terhubung dengan Wallet secara otomatis mengembalikan saldo Goal sekaligus saldo Wallet terkait.
+    * **Digital Invoice**: Menampilkan baris informasi **Source / Destination** (nama Wallet atau External Funds).
+    * **Purge Account**: Membersihkan `discash_goals` dan `discash_wallets`.
+  - **Kepatuhan Mutlak**: Murni slide vertikal untuk seluruh sheet, tanpa backdrop blur, tanpa box-in-box, tanpa badge/pill liar, dan seluruh elemen interaktif utama bergaya Tactile 3D.
+
+- **[2026-10-14] Posisi Ikon Pin Tepat di Titik Sudut Kanan Atas Kartu (Corner Vertex Overlay) dengan Style 3D Tactile**:
+  - Seluruh kartu yang di-pin (`goal.isPinned` atau `wallet.isPinned` pada `GoalPage.tsx`, `WalletPage.tsx`, dan `GoalArchivePage.tsx`) menampilkan indikator ikon pin **benar-benar di titik sudut kanan atas batas luar kartu** (`absolute -top-1.5 -right-1.5 z-10`), tidak masuk ke dalam area konten/layout kartu dan tidak menggeser/memberi padding tambahan pada isi kartu.
+  - Menggunakan style **Tactile 3D Blurple berukuran kompak**: `w-5 h-5 rounded-lg bg-gradient-to-b from-[#6975F7] to-[#4752C4] border-b-[1.5px] border-[#363FA0] ring-2 ring-[#313338] text-white shadow-[inset_0_1px_1px_rgba(255,255,255,0.45),0_2px_5px_rgba(88,101,242,0.5)]` dengan ikon pin putih `w-2.5 h-2.5` ber-drop shadow.
+
+- **[2026-10-14] Fitur Main Wallet (Eksklusif 1 Wallet) dengan Ikon Bintang Oranye Tactile 3D di Samping Nama Wallet**:
+  - **Eksklusivitas Main Wallet**: Hanya **satu (1)** wallet yang dapat dijadikan Main Wallet (`isMain: true`) pada satu waktu. Mengatur suatu wallet sebagai Main otomatis melepas status `isMain` dari wallet lainnya.
+  - **Indikator Visual Ikon Bintang Oranye Tactile 3D**: Wallet yang diset sebagai Main menampilkan **ikon bintang berwarna oranye bergaya 3D Tactile** (gradien permukaan oranye atas-bawah `#FFB84D` ke `#E56200` + ekstrusi bevel fisik bawah `drop-shadow(0 1.5px 0 #A84400) drop-shadow(0 3px 6px rgba(255,122,0,0.55))`) persis di samping nama walletnya (pada `WalletPage.tsx`, `WalletDetailSheet.tsx`, `WalletActionPickerSheet.tsx`, dan pemilih wallet di `GoalMutationSheet.tsx`).
+  - **Aksi Set/Remove Main Wallet**: Tersedia di menu opsi `WalletActionPickerSheet.tsx` dan `WalletDetailSheet.tsx`, serta otomatis terpilih sebagai default sumber dana saat melakukan mutasi Goal jika ada Main Wallet.
+
+- **[2026-10-14] Dashboard: Carousel Terpisah Kartu Total Savings & Total Assets dengan Segmented Button Jelly Bounce**:
+  - Di halaman `Dashboard`, kartu **Total Savings** dan **Total Assets** dipisahkan menjadi 2 slide kartu di dalam **Carousel** (`TotalBalanceCard.tsx`).
+  - Di bagian atas carousel terdapat **Segmented Button** murni teks tanpa ikon (`Saving` | `Assets`) dengan indikator aktif bergaya Tactile 3D yang bergerak menggunakan animasi **smooth jelly bounce** (`layout` spring elastis + efek squash-and-stretch `scaleX` / `scaleY` halus saat berpindah).
+  - Carousel dapat digeser dengan **drag / swipe horizontal** (tanpa jump posisi dan 100% pas mengikuti lebar parent container) maupun dengan mengklik tombol pada segmented control.
+
+- **[2026-10-14] Dashboard: Kartu Assets Distribution**:
+  - Di halaman `Dashboard`, terdapat kartu **Assets Distribution** (`AssetsDistributionCard.tsx`) untuk menampilkan breakdown distribusi saldo antar wallet (persentase alokasi wallet, multi-segment bar bergaya Tactile 3D, daftar wallet beserta nominal & persentase, serta klik item untuk membuka detail wallet).
+
+- **[2026-10-14] Halaman Goals: Barisan Tombol Sort dengan Invisible Scrollbar, Stop Swipe Propagation, & Dynamic Fading Edges**:
+  - Pada barisan tombol sorting di `GoalPage.tsx`:
+    * Gestur sentuh/geser horizontal diisolasi (`e.stopPropagation()` pada `onTouchStart`, `onTouchEnd`, `onMouseDown`, `onMouseUp` + `touch-pan-x`) agar menggeser tombol sort tidak memicu perpindahan tab halaman utama.
+    * Scrollbar disembunyikan sepenuhnya (`.no-scrollbar` di `index.css`).
+    * Terdapat **fading edges** di sisi kiri dan kanan (`from-[#313338] to-transparent`) yang muncul/menghilang secara dinamis dengan transisi halus (`transition-opacity duration-300 ease-out`) saat posisi scroll sudah mentok di ujung kiri atau ujung kanan.

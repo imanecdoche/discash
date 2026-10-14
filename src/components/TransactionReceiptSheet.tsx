@@ -270,6 +270,16 @@ export function TransactionReceiptSheet({
                     </div>
                   )}
 
+                  {/* Source / Destination Wallet */}
+                  <div className="py-2.5 flex items-center justify-between gap-2">
+                    <span className="text-[#949BA4]">
+                      {isDeposit ? 'Funding Source' : 'Destination'}
+                    </span>
+                    <span className="font-semibold text-[#DBDEE1] truncate max-w-[200px]">
+                      {transaction.walletName || 'External Funds'}
+                    </span>
+                  </div>
+
                   {/* Date & Time */}
                   <div className="py-2.5 flex items-center justify-between gap-2">
                     <span className="text-[#949BA4]">Date & Time</span>
@@ -378,7 +388,7 @@ export function TransactionReceiptSheet({
                         <span className="font-bold text-[#DBDEE1]">
                           {formatIDR(transaction.amount)}
                         </span>
-                        {transaction.note ? ` ("${transaction.note}")` : ''}? The goal balance will be automatically reverted by{' '}
+                        {transaction.note ? ` ("${transaction.note}")` : ''}? The goal balance{transaction.walletName ? ` and "${transaction.walletName}" wallet balance` : ''} will be automatically reverted by{' '}
                         <span className="font-bold text-[#DBDEE1]">
                           {formatIDR(transaction.amount)}
                         </span>.

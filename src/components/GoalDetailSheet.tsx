@@ -6,14 +6,25 @@ import { PRESET_ICONS, renderGoalIcon } from './GoalIcon'
 import { GoalMutationSheet } from './GoalMutationSheet'
 import { DiscordLogo } from './DiscordLogo'
 import type { Goal, GoalTransaction } from '../types/goal'
+import type { Wallet } from '../types/wallet'
 
 interface GoalDetailSheetProps {
   isOpen: boolean
   goal: Goal | null
+  wallets?: Wallet[]
   onClose: () => void
   onUpdateGoal: (updatedGoal: Goal) => void
   onDeleteGoal: (goalId: string) => void
+  onRecordGoalMutation?: (
+    goal: Goal,
+    type: 'deposit' | 'withdraw',
+    amount: number,
+    note: string,
+    selectedWalletId?: string
+  ) => void
+  onDeleteGoalTransaction?: (goalId: string, transactionId: string) => void
   onSelectTransaction?: (transaction: GoalTransaction, goal: Goal) => void
+  onOpenNewWallet?: () => void
   initialMode?: SheetMode
 }
 
@@ -22,10 +33,14 @@ type SheetMode = 'detail' | 'edit'
 export function GoalDetailSheet({
   isOpen,
   goal,
+  wallets = [],
   onClose,
   onUpdateGoal,
   onDeleteGoal,
+  onRecordGoalMutation,
+  onDeleteGoalTransaction,
   onSelectTransaction,
+  onOpenNewWallet,
   initialMode = 'detail',
 }: GoalDetailSheetProps) {
   const [mode, setMode] = useState<SheetMode>(initialMode)
@@ -136,8 +151,18 @@ export function GoalDetailSheet({
   }
 
   // --- Handlers for Mutations (Deposit / Withdraw via Dedicated Sheet) ---
-  const handleConfirmMutation = (amount: number, note: string) => {
+  const handleConfirmMutation = (
+    amount: number,
+    note: string,
+    selectedWalletId?: string
+  ) => {
     if (!activeGoal) return
+
+    if (onRecordGoalMutation) {
+      onRecordGoalMutation(activeGoal, activeMutationType, amount, note, selectedWalletId)
+      setIsMutationOpen(false)
+      return
+    }
 
     const newTransaction: GoalTransaction = {
       id: `trx_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`,
@@ -167,6 +192,10 @@ export function GoalDetailSheet({
   const handleDeleteTransaction = useCallback(
     (transactionId: string) => {
       if (!activeGoal) return
+      if (onDeleteGoalTransaction) {
+        onDeleteGoalTransaction(activeGoal.id, transactionId)
+        return
+      }
       const targetTrx = (activeGoal.transactions || []).find((t) => t.id === transactionId)
       if (!targetTrx) return
 
@@ -185,7 +214,7 @@ export function GoalDetailSheet({
 
       onUpdateGoal(updatedGoal)
     },
-    [activeGoal, onUpdateGoal]
+    [activeGoal, onDeleteGoalTransaction, onUpdateGoal]
   )
 
   // --- Handlers for Edit Goal ---
@@ -590,8 +619,10 @@ export function GoalDetailSheet({
                               <div className="text-sm font-semibold text-[#E0E1E5] truncate">
                                 {trx.note}
                               </div>
-                              <div className="text-[11px] text-[#949BA4]">
-                                {formattedDate}
+                              <div className="text-[11px] text-[#949BA4] truncate">
+                                {trx.walletName
+                                  ? `${isDeposit ? 'From' : 'To'} ${trx.walletName} • ${formattedDate}`
+                                  : formattedDate}
                               </div>
                             </div>
 
@@ -1215,7 +1246,7 @@ export function GoalDetailSheet({
                         <span className="font-bold text-[#DBDEE1]">
                           {formatIDR(deletingTransaction.amount)}
                         </span>
-                        {deletingTransaction.note ? ` ("${deletingTransaction.note}")` : ''}? The goal balance will be automatically reverted by{' '}
+                        {deletingTransaction.note ? ` ("${deletingTransaction.note}")` : ''}? The goal balance{deletingTransaction.walletName ? ` and "${deletingTransaction.walletName}" wallet balance` : ''} will be automatically reverted by{' '}
                         <span className="font-bold text-[#DBDEE1]">
                           {formatIDR(deletingTransaction.amount)}
                         </span>.
@@ -1476,8 +1507,10 @@ export function GoalDetailSheet({
         isOpen={isMutationOpen}
         type={activeMutationType}
         currentAmount={activeGoal.currentAmount || 0}
+        wallets={wallets}
         onClose={() => setIsMutationOpen(false)}
         onConfirm={handleConfirmMutation}
+        onOpenNewWallet={onOpenNewWallet}
       />
     </>
   )

@@ -5,6 +5,10 @@ export interface GoalTransaction {
   amount: number
   note: string
   createdAt: string
+  sourceType?: 'wallet' | 'external'
+  walletId?: string
+  walletName?: string
+  walletTransactionId?: string
 }
 
 export interface Goal {

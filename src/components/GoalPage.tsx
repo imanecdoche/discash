@@ -1,4 +1,4 @@
-import { useState, useMemo, useRef } from 'react'
+import { useState, useMemo, useRef, useEffect, useCallback } from 'react'
 import type { Goal } from '../types/goal'
 import { GoalEmptyState } from './GoalEmptyState'
 import { renderGoalIcon } from './GoalIcon'
@@ -38,6 +38,28 @@ export function GoalPage({
   const longPressTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
   const isLongPressActive = useRef(false)
   const touchStartPos = useRef<{ x: number; y: number }>({ x: 0, y: 0 })
+
+  // Sort bar horizontal scroll & dynamic fading edges state
+  const sortScrollRef = useRef<HTMLDivElement | null>(null)
+  const [canScrollLeft, setCanScrollLeft] = useState(false)
+  const [canScrollRight, setCanScrollRight] = useState(false)
+
+  const updateSortScrollEdges = useCallback(() => {
+    const el = sortScrollRef.current
+    if (!el) return
+    const { scrollLeft, scrollWidth, clientWidth } = el
+    setCanScrollLeft(scrollLeft > 2)
+    setCanScrollRight(scrollLeft + clientWidth < scrollWidth - 2)
+  }, [])
+
+  useEffect(() => {
+    const el = sortScrollRef.current
+    if (!el) return
+    updateSortScrollEdges()
+    const observer = new ResizeObserver(updateSortScrollEdges)
+    observer.observe(el)
+    return () => observer.disconnect()
+  }, [updateSortScrollEdges, goals.length])
 
   const clearLongPress = () => {
     if (longPressTimer.current) {
@@ -283,123 +305,151 @@ export function GoalPage({
             )}
           </div>
 
-          {/* Sorting Tabs / Controls - 3D Tactile Buttons */}
-          <div className="flex items-center gap-2 overflow-x-auto no-scrollbar py-1">
-            <span className="text-[11px] font-black text-[#949BA4] uppercase tracking-wider pl-1 pr-0.5 shrink-0 select-none">
-              Sort:
-            </span>
-
-            {/* Created */}
-            <button
-              type="button"
-              onClick={() => handleSortClick('created')}
-              className={`px-3 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1.5 shrink-0 transition-all cursor-pointer select-none ${
-                sortBy === 'created'
-                  ? 'bg-gradient-to-b from-[#6975F7] to-[#4752C4] border-b-[2px] border-[#363FA0] ring-1 ring-[#1E1F22] text-white shadow-[inset_0_1px_1px_rgba(255,255,255,0.45),0_2px_5px_rgba(88,101,242,0.35)] active:translate-y-0.5 active:border-b-[1px] active:scale-[0.98]'
-                  : 'bg-gradient-to-b from-[#4E5058] to-[#35373C] border-b-[2px] border-[#232428] ring-1 ring-[#1E1F22] text-[#DBDEE1] hover:text-white shadow-[inset_0_1px_1px_rgba(255,255,255,0.25),0_2px_4px_rgba(0,0,0,0.3)] active:translate-y-0.5 active:border-b-[1px] active:scale-[0.98]'
+          {/* Sorting Tabs / Controls - 3D Tactile Buttons with Invisible Scrollbar & Smooth Fading Edges */}
+          <div
+            className="relative w-full"
+            onTouchStart={(e) => e.stopPropagation()}
+            onTouchEnd={(e) => e.stopPropagation()}
+            onMouseDown={(e) => e.stopPropagation()}
+            onMouseUp={(e) => e.stopPropagation()}
+          >
+            {/* Left Fading Edge */}
+            <div
+              aria-hidden="true"
+              className={`pointer-events-none absolute inset-y-0 left-0 z-10 w-8 bg-gradient-to-r from-[#313338] via-[#313338]/85 to-transparent transition-opacity duration-300 ease-out ${
+                canScrollLeft ? 'opacity-100' : 'opacity-0'
               }`}
-            >
-              <span className="drop-shadow-[0_1px_1px_rgba(0,0,0,0.4)]">Created</span>
-              {sortBy === 'created' && (
-                <svg
-                  viewBox="0 0 24 24"
-                  className={`w-3 h-3 drop-shadow-[0_1px_1px_rgba(0,0,0,0.4)] transition-transform ${
-                    sortOrder === 'asc' ? 'rotate-180' : ''
-                  }`}
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2.5"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
-                  <path d="m6 9 6 6 6-6" />
-                </svg>
-              )}
-            </button>
+            />
 
-            {/* Updated */}
-            <button
-              type="button"
-              onClick={() => handleSortClick('updated')}
-              className={`px-3 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1.5 shrink-0 transition-all cursor-pointer select-none ${
-                sortBy === 'updated'
-                  ? 'bg-gradient-to-b from-[#6975F7] to-[#4752C4] border-b-[2px] border-[#363FA0] ring-1 ring-[#1E1F22] text-white shadow-[inset_0_1px_1px_rgba(255,255,255,0.45),0_2px_5px_rgba(88,101,242,0.35)] active:translate-y-0.5 active:border-b-[1px] active:scale-[0.98]'
-                  : 'bg-gradient-to-b from-[#4E5058] to-[#35373C] border-b-[2px] border-[#232428] ring-1 ring-[#1E1F22] text-[#DBDEE1] hover:text-white shadow-[inset_0_1px_1px_rgba(255,255,255,0.25),0_2px_4px_rgba(0,0,0,0.3)] active:translate-y-0.5 active:border-b-[1px] active:scale-[0.98]'
+            {/* Right Fading Edge */}
+            <div
+              aria-hidden="true"
+              className={`pointer-events-none absolute inset-y-0 right-0 z-10 w-8 bg-gradient-to-l from-[#313338] via-[#313338]/85 to-transparent transition-opacity duration-300 ease-out ${
+                canScrollRight ? 'opacity-100' : 'opacity-0'
               }`}
-            >
-              <span className="drop-shadow-[0_1px_1px_rgba(0,0,0,0.4)]">Updated</span>
-              {sortBy === 'updated' && (
-                <svg
-                  viewBox="0 0 24 24"
-                  className={`w-3 h-3 drop-shadow-[0_1px_1px_rgba(0,0,0,0.4)] transition-transform ${
-                    sortOrder === 'asc' ? 'rotate-180' : ''
-                  }`}
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2.5"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
-                  <path d="m6 9 6 6 6-6" />
-                </svg>
-              )}
-            </button>
+            />
 
-            {/* Alphabetical */}
-            <button
-              type="button"
-              onClick={() => handleSortClick('alpha')}
-              className={`px-3 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1.5 shrink-0 transition-all cursor-pointer select-none ${
-                sortBy === 'alpha'
-                  ? 'bg-gradient-to-b from-[#6975F7] to-[#4752C4] border-b-[2px] border-[#363FA0] ring-1 ring-[#1E1F22] text-white shadow-[inset_0_1px_1px_rgba(255,255,255,0.45),0_2px_5px_rgba(88,101,242,0.35)] active:translate-y-0.5 active:border-b-[1px] active:scale-[0.98]'
-                  : 'bg-gradient-to-b from-[#4E5058] to-[#35373C] border-b-[2px] border-[#232428] ring-1 ring-[#1E1F22] text-[#DBDEE1] hover:text-white shadow-[inset_0_1px_1px_rgba(255,255,255,0.25),0_2px_4px_rgba(0,0,0,0.3)] active:translate-y-0.5 active:border-b-[1px] active:scale-[0.98]'
-              }`}
+            <div
+              ref={sortScrollRef}
+              onScroll={updateSortScrollEdges}
+              className="flex items-center gap-2 overflow-x-auto no-scrollbar py-1 px-0.5 touch-pan-x"
             >
-              <span className="drop-shadow-[0_1px_1px_rgba(0,0,0,0.4)]">A-Z</span>
-              {sortBy === 'alpha' && (
-                <svg
-                  viewBox="0 0 24 24"
-                  className={`w-3 h-3 drop-shadow-[0_1px_1px_rgba(0,0,0,0.4)] transition-transform ${
-                    sortOrder === 'desc' ? 'rotate-180' : ''
-                  }`}
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2.5"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
-                  <path d="m6 9 6 6 6-6" />
-                </svg>
-              )}
-            </button>
+              <span className="text-[11px] font-black text-[#949BA4] uppercase tracking-wider pl-1 pr-0.5 shrink-0 select-none">
+                Sort:
+              </span>
 
-            {/* Progress */}
-            <button
-              type="button"
-              onClick={() => handleSortClick('progress')}
-              className={`px-3 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1.5 shrink-0 transition-all cursor-pointer select-none ${
-                sortBy === 'progress'
-                  ? 'bg-gradient-to-b from-[#6975F7] to-[#4752C4] border-b-[2px] border-[#363FA0] ring-1 ring-[#1E1F22] text-white shadow-[inset_0_1px_1px_rgba(255,255,255,0.45),0_2px_5px_rgba(88,101,242,0.35)] active:translate-y-0.5 active:border-b-[1px] active:scale-[0.98]'
-                  : 'bg-gradient-to-b from-[#4E5058] to-[#35373C] border-b-[2px] border-[#232428] ring-1 ring-[#1E1F22] text-[#DBDEE1] hover:text-white shadow-[inset_0_1px_1px_rgba(255,255,255,0.25),0_2px_4px_rgba(0,0,0,0.3)] active:translate-y-0.5 active:border-b-[1px] active:scale-[0.98]'
-              }`}
-            >
-              <span className="drop-shadow-[0_1px_1px_rgba(0,0,0,0.4)]">Progress</span>
-              {sortBy === 'progress' && (
-                <svg
-                  viewBox="0 0 24 24"
-                  className={`w-3 h-3 drop-shadow-[0_1px_1px_rgba(0,0,0,0.4)] transition-transform ${
-                    sortOrder === 'asc' ? 'rotate-180' : ''
-                  }`}
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2.5"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
-                  <path d="m6 9 6 6 6-6" />
-                </svg>
-              )}
-            </button>
+              {/* Created */}
+              <button
+                type="button"
+                onClick={() => handleSortClick('created')}
+                className={`px-3 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1.5 shrink-0 transition-all cursor-pointer select-none ${
+                  sortBy === 'created'
+                    ? 'bg-gradient-to-b from-[#6975F7] to-[#4752C4] border-b-[2px] border-[#363FA0] ring-1 ring-[#1E1F22] text-white shadow-[inset_0_1px_1px_rgba(255,255,255,0.45),0_2px_5px_rgba(88,101,242,0.35)] active:translate-y-0.5 active:border-b-[1px] active:scale-[0.98]'
+                    : 'bg-gradient-to-b from-[#4E5058] to-[#35373C] border-b-[2px] border-[#232428] ring-1 ring-[#1E1F22] text-[#DBDEE1] hover:text-white shadow-[inset_0_1px_1px_rgba(255,255,255,0.25),0_2px_4px_rgba(0,0,0,0.3)] active:translate-y-0.5 active:border-b-[1px] active:scale-[0.98]'
+                }`}
+              >
+                <span className="drop-shadow-[0_1px_1px_rgba(0,0,0,0.4)]">Created</span>
+                {sortBy === 'created' && (
+                  <svg
+                    viewBox="0 0 24 24"
+                    className={`w-3 h-3 drop-shadow-[0_1px_1px_rgba(0,0,0,0.4)] transition-transform ${
+                      sortOrder === 'asc' ? 'rotate-180' : ''
+                    }`}
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2.5"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <path d="m6 9 6 6 6-6" />
+                  </svg>
+                )}
+              </button>
+
+              {/* Updated */}
+              <button
+                type="button"
+                onClick={() => handleSortClick('updated')}
+                className={`px-3 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1.5 shrink-0 transition-all cursor-pointer select-none ${
+                  sortBy === 'updated'
+                    ? 'bg-gradient-to-b from-[#6975F7] to-[#4752C4] border-b-[2px] border-[#363FA0] ring-1 ring-[#1E1F22] text-white shadow-[inset_0_1px_1px_rgba(255,255,255,0.45),0_2px_5px_rgba(88,101,242,0.35)] active:translate-y-0.5 active:border-b-[1px] active:scale-[0.98]'
+                    : 'bg-gradient-to-b from-[#4E5058] to-[#35373C] border-b-[2px] border-[#232428] ring-1 ring-[#1E1F22] text-[#DBDEE1] hover:text-white shadow-[inset_0_1px_1px_rgba(255,255,255,0.25),0_2px_4px_rgba(0,0,0,0.3)] active:translate-y-0.5 active:border-b-[1px] active:scale-[0.98]'
+                }`}
+              >
+                <span className="drop-shadow-[0_1px_1px_rgba(0,0,0,0.4)]">Updated</span>
+                {sortBy === 'updated' && (
+                  <svg
+                    viewBox="0 0 24 24"
+                    className={`w-3 h-3 drop-shadow-[0_1px_1px_rgba(0,0,0,0.4)] transition-transform ${
+                      sortOrder === 'asc' ? 'rotate-180' : ''
+                    }`}
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2.5"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <path d="m6 9 6 6 6-6" />
+                  </svg>
+                )}
+              </button>
+
+              {/* Alphabetical */}
+              <button
+                type="button"
+                onClick={() => handleSortClick('alpha')}
+                className={`px-3 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1.5 shrink-0 transition-all cursor-pointer select-none ${
+                  sortBy === 'alpha'
+                    ? 'bg-gradient-to-b from-[#6975F7] to-[#4752C4] border-b-[2px] border-[#363FA0] ring-1 ring-[#1E1F22] text-white shadow-[inset_0_1px_1px_rgba(255,255,255,0.45),0_2px_5px_rgba(88,101,242,0.35)] active:translate-y-0.5 active:border-b-[1px] active:scale-[0.98]'
+                    : 'bg-gradient-to-b from-[#4E5058] to-[#35373C] border-b-[2px] border-[#232428] ring-1 ring-[#1E1F22] text-[#DBDEE1] hover:text-white shadow-[inset_0_1px_1px_rgba(255,255,255,0.25),0_2px_4px_rgba(0,0,0,0.3)] active:translate-y-0.5 active:border-b-[1px] active:scale-[0.98]'
+                }`}
+              >
+                <span className="drop-shadow-[0_1px_1px_rgba(0,0,0,0.4)]">A-Z</span>
+                {sortBy === 'alpha' && (
+                  <svg
+                    viewBox="0 0 24 24"
+                    className={`w-3 h-3 drop-shadow-[0_1px_1px_rgba(0,0,0,0.4)] transition-transform ${
+                      sortOrder === 'desc' ? 'rotate-180' : ''
+                    }`}
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2.5"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <path d="m6 9 6 6 6-6" />
+                  </svg>
+                )}
+              </button>
+
+              {/* Progress */}
+              <button
+                type="button"
+                onClick={() => handleSortClick('progress')}
+                className={`px-3 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1.5 shrink-0 transition-all cursor-pointer select-none ${
+                  sortBy === 'progress'
+                    ? 'bg-gradient-to-b from-[#6975F7] to-[#4752C4] border-b-[2px] border-[#363FA0] ring-1 ring-[#1E1F22] text-white shadow-[inset_0_1px_1px_rgba(255,255,255,0.45),0_2px_5px_rgba(88,101,242,0.35)] active:translate-y-0.5 active:border-b-[1px] active:scale-[0.98]'
+                    : 'bg-gradient-to-b from-[#4E5058] to-[#35373C] border-b-[2px] border-[#232428] ring-1 ring-[#1E1F22] text-[#DBDEE1] hover:text-white shadow-[inset_0_1px_1px_rgba(255,255,255,0.25),0_2px_4px_rgba(0,0,0,0.3)] active:translate-y-0.5 active:border-b-[1px] active:scale-[0.98]'
+                }`}
+              >
+                <span className="drop-shadow-[0_1px_1px_rgba(0,0,0,0.4)]">Progress</span>
+                {sortBy === 'progress' && (
+                  <svg
+                    viewBox="0 0 24 24"
+                    className={`w-3 h-3 drop-shadow-[0_1px_1px_rgba(0,0,0,0.4)] transition-transform ${
+                      sortOrder === 'asc' ? 'rotate-180' : ''
+                    }`}
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2.5"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <path d="m6 9 6 6 6-6" />
+                  </svg>
+                )}
+              </button>
+            </div>
           </div>
 
           {/* Goal Cards List */}
@@ -452,7 +502,7 @@ export function GoalPage({
                       handleCardClick(goal)
                     }
                   }}
-                  className={`w-full bg-[#2B2D31] hover:bg-[#35373C] rounded-2xl border p-4 flex flex-col gap-3 select-none shadow-sm cursor-pointer transition-all duration-150 ${
+                  className={`relative w-full bg-[#2B2D31] hover:bg-[#35373C] rounded-2xl border p-4 flex flex-col gap-3 select-none shadow-sm cursor-pointer transition-all duration-150 ${
                     holdingGoalId === goal.id
                       ? 'scale-[0.98] ring-2 ring-[#5865F2]/40 bg-[#35373C]'
                       : 'active:scale-[0.99]'
@@ -462,7 +512,23 @@ export function GoalPage({
                       : 'border-[#1F2023]/80'
                   }`}
                 >
-                  {/* Top Row: Icon + Title & Description + Pin Indicator */}
+                  {/* Tactile 3D Pin Indicator Right on Top-Right Card Corner Vertex */}
+                  {goal.isPinned && (
+                    <div
+                      className="absolute -top-1.5 -right-1.5 z-10 w-5 h-5 rounded-lg bg-gradient-to-b from-[#6975F7] to-[#4752C4] border-b-[1.5px] border-[#363FA0] ring-2 ring-[#313338] text-white shadow-[inset_0_1px_1px_rgba(255,255,255,0.45),0_2px_5px_rgba(88,101,242,0.5)] flex items-center justify-center shrink-0 select-none pointer-events-none"
+                      aria-label="Pinned Goal"
+                      title="Pinned Goal"
+                    >
+                      <svg
+                        viewBox="0 0 24 24"
+                        className="w-2.5 h-2.5 fill-current drop-shadow-[0_1px_1px_rgba(0,0,0,0.4)]"
+                      >
+                        <path d="M16 12V4h1V2H7v2h1v8l-2 3v2h5v5l1 1 1-1v-5h5v-2l-2-3Z" />
+                      </svg>
+                    </div>
+                  )}
+
+                  {/* Top Row: Icon + Title & Description */}
                   <div className="flex items-center gap-3">
                     <div
                       className={`w-11 h-11 rounded-2xl shrink-0 overflow-hidden relative flex items-center justify-center select-none ring-2 ring-[#1E1F22] transition-all ${
@@ -504,16 +570,6 @@ export function GoalPage({
                               ACHIEVED
                             </span>
                           </span>
-                        )}
-                        {goal.isPinned && (
-                          <svg
-                            viewBox="0 0 24 24"
-                            className="w-3.5 h-3.5 text-[#5865F2] shrink-0 fill-current drop-shadow-[0_1px_2px_rgba(88,101,242,0.4)]"
-                            aria-label="Pinned Goal"
-                          >
-                            <title>Pinned Goal</title>
-                            <path d="M16 12V4h1V2H7v2h1v8l-2 3v2h5v5l1 1 1-1v-5h5v-2l-2-3Z" />
-                          </svg>
                         )}
                       </div>
                       {goal.description && (

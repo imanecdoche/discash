@@ -65,3 +65,15 @@ body,
   backface-visibility: hidden;
   perspective: 1000px;
 }
+
+/* Hide Scrollbars Visually While Keeping Smooth Touch Scroll */
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+  width: 0;
+  height: 0;
+}

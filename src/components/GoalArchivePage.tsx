@@ -219,12 +219,32 @@ export function GoalArchivePage({
                           handleCardClick(goal)
                         }
                       }}
-                      className={`w-full bg-[#2B2D31] hover:bg-[#35373C] rounded-2xl border border-[#1F2023]/80 p-4 flex flex-col gap-3 select-none shadow-sm cursor-pointer transition-all duration-150 ${
+                      className={`relative w-full bg-[#2B2D31] hover:bg-[#35373C] rounded-2xl border p-4 flex flex-col gap-3 select-none shadow-sm cursor-pointer transition-all duration-150 ${
                         holdingGoalId === goal.id
                           ? 'scale-[0.98] ring-2 ring-[#5865F2]/40 bg-[#35373C]'
                           : 'active:scale-[0.99]'
+                      } ${
+                        goal.isPinned
+                          ? 'border-[#5865F2]/40 ring-1 ring-[#5865F2]/20'
+                          : 'border-[#1F2023]/80'
                       }`}
                     >
+                      {/* Tactile 3D Pin Indicator Right on Top-Right Card Corner Vertex */}
+                      {goal.isPinned && (
+                        <div
+                          className="absolute -top-1.5 -right-1.5 z-10 w-5 h-5 rounded-lg bg-gradient-to-b from-[#6975F7] to-[#4752C4] border-b-[1.5px] border-[#363FA0] ring-2 ring-[#313338] text-white shadow-[inset_0_1px_1px_rgba(255,255,255,0.45),0_2px_5px_rgba(88,101,242,0.5)] flex items-center justify-center shrink-0 select-none pointer-events-none"
+                          aria-label="Pinned Goal"
+                          title="Pinned Goal"
+                        >
+                          <svg
+                            viewBox="0 0 24 24"
+                            className="w-2.5 h-2.5 fill-current drop-shadow-[0_1px_1px_rgba(0,0,0,0.4)]"
+                          >
+                            <path d="M16 12V4h1V2H7v2h1v8l-2 3v2h5v5l1 1 1-1v-5h5v-2l-2-3Z" />
+                          </svg>
+                        </div>
+                      )}
+
                       {/* Top Row: Icon + Title & Description */}
                       <div className="flex items-center gap-3">
                         <div

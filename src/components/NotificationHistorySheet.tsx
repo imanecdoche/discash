@@ -271,8 +271,10 @@ export function NotificationHistorySheet({
                           <div className="text-xs text-[#DBDEE1]/80 truncate mt-0.5">
                             {trx.note || (isDeposit ? 'Deposit' : 'Withdrawal')}
                           </div>
-                          <div className="text-[11px] text-[#949BA4] mt-0.5">
-                            {formattedDate}
+                          <div className="text-[11px] text-[#949BA4] mt-0.5 truncate">
+                            {trx.walletName
+                              ? `${isDeposit ? 'From' : 'To'} ${trx.walletName} • ${formattedDate}`
+                              : formattedDate}
                           </div>
                         </div>
 

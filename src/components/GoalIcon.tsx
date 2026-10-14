@@ -9,6 +9,11 @@ export type GoalPresetIcon =
   | 'gamepad'
   | 'gift'
   | 'star'
+  | 'wallet'
+  | 'bank'
+  | 'card'
+  | 'cash'
+  | 'vault'
 
 export interface IconOption {
   id: GoalPresetIcon
@@ -26,6 +31,52 @@ export const PRESET_ICONS: IconOption[] = [
   { id: 'gift', label: 'Gift' },
   { id: 'star', label: 'Dream' },
 ]
+
+export const WALLET_PRESET_ICONS: IconOption[] = [
+  { id: 'wallet', label: 'Wallet' },
+  { id: 'bank', label: 'Bank Account' },
+  { id: 'card', label: 'Debit / Credit Card' },
+  { id: 'cash', label: 'Cash Money' },
+  { id: 'vault', label: 'Safe Vault' },
+  { id: 'piggy', label: 'Savings Jar' },
+  { id: 'star', label: 'Investment' },
+  { id: 'laptop', label: 'Digital E-Wallet' },
+  { id: 'gift', label: 'Bonus Fund' },
+]
+
+export function renderTactileOrangeStar(className = 'w-4 h-4') {
+  return (
+    <span
+      className="inline-flex items-center justify-center shrink-0 select-none self-center -translate-y-[2.5px]"
+      title="Main Wallet"
+      aria-label="Main Wallet"
+    >
+      <svg
+        viewBox="1 1 22 21"
+        className={`block ${className}`}
+        style={{
+          filter:
+            'drop-shadow(0 1.5px 0px #A84400) drop-shadow(0 2.5px 0.5px #6E2B00) drop-shadow(0 3px 6px rgba(255, 122, 0, 0.55))',
+        }}
+      >
+        <defs>
+          <linearGradient id="tactile-orange-star-grad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor="#FFC266" />
+            <stop offset="45%" stopColor="#FF8800" />
+            <stop offset="100%" stopColor="#D95300" />
+          </linearGradient>
+        </defs>
+        <polygon
+          points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"
+          fill="url(#tactile-orange-star-grad)"
+          stroke="#FFE0B2"
+          strokeWidth="1.2"
+          strokeLinejoin="round"
+        />
+      </svg>
+    </span>
+  )
+}
 
 export function renderGoalIcon(iconId: string, customPhoto?: string, className = 'w-5 h-5') {
   if (iconId === 'custom' && customPhoto) {
@@ -99,6 +150,48 @@ export function renderGoalIcon(iconId: string, customPhoto?: string, className =
       return (
         <svg viewBox="0 0 24 24" className={className} fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
           <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+        </svg>
+      )
+    case 'wallet':
+      return (
+        <svg viewBox="0 0 24 24" className={className} fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M19 7V4a1 1 0 0 0-1-1H5a2 2 0 0 0 0 4h15a1 1 0 0 1 1 1v4h-3a2 2 0 0 0 0 4h3a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1" />
+          <path d="M3 5v14a2 2 0 0 0 2 2h15a1 1 0 0 0 1-1v-4" />
+        </svg>
+      )
+    case 'bank':
+      return (
+        <svg viewBox="0 0 24 24" className={className} fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <line x1="3" y1="22" x2="21" y2="22" />
+          <line x1="6" y1="18" x2="6" y2="11" />
+          <line x1="10" y1="18" x2="10" y2="11" />
+          <line x1="14" y1="18" x2="14" y2="11" />
+          <line x1="18" y1="18" x2="18" y2="11" />
+          <polygon points="12 2 20 7 4 7" />
+        </svg>
+      )
+    case 'card':
+      return (
+        <svg viewBox="0 0 24 24" className={className} fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <rect width="20" height="14" x="2" y="5" rx="2" />
+          <line x1="2" y1="10" x2="22" y2="10" />
+        </svg>
+      )
+    case 'cash':
+      return (
+        <svg viewBox="0 0 24 24" className={className} fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <rect width="20" height="12" x="2" y="6" rx="2" />
+          <circle cx="12" cy="12" r="2" />
+          <path d="M6 12h.01M18 12h.01" />
+        </svg>
+      )
+    case 'vault':
+      return (
+        <svg viewBox="0 0 24 24" className={className} fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <rect width="18" height="18" x="3" y="3" rx="2" />
+          <circle cx="12" cy="12" r="4" />
+          <line x1="12" y1="8" x2="12" y2="12" />
+          <line x1="12" y1="12" x2="15" y2="12" />
         </svg>
       )
     case 'goal':
